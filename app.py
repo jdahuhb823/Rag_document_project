@@ -64,6 +64,23 @@ def main():
     # Build llm_predict adapter for Ollama if present
     llm_predict = get_ollama_predict()
 
+    # Verify that Ollama is actually reachable (daemon running). If it's not
+    # reachable, disable LLM features for this session and inform the user.
+    ollama_available = False
+    if llm_predict is not None:
+        try:
+            # Lightweight health-check call. If this raises, we fall back to disabled mode.
+            llm_predict("Ping")
+            ollama_available = True
+        except Exception as e:  # pragma: no cover - runtime behavior depends on env
+            logger.debug("Ollama client present but not responding: %s", e)
+            llm_predict = None
+
+    if not ollama_available:
+        # Required user-facing message for non-local environments (e.g., Streamlit Cloud)
+        st.warning("This app requires a local Ollama service. Full functionality is available when running locally.")
+        st.info("LLM features are disabled in this environment; you can still upload files to view loader-only results.")
+
     controller = Controller(labels=[l.strip() for l in labels_input.split(",")], llm_predict=llm_predict)
 
     if run_btn:
