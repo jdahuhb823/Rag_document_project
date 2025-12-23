@@ -36,6 +36,17 @@ import json
 import pandas as pd
 from lxml import etree
 
+# Optional parsing libraries with safe fallbacks
+try:
+	import docx as python_docx  # python-docx
+except Exception:  # pragma: no cover - optional dependency
+	python_docx = None
+
+try:
+	import openpyxl  # xlsx support for pandas
+except Exception:  # pragma: no cover - optional dependency
+	openpyxl = None
+
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
@@ -164,8 +175,39 @@ def _get_loader_for_path(path: Union[str, Path]):
 			raise RuntimeError("TextLoader is not available. Ensure langchain is installed.")
 		return TextLoader(str(p), encoding="utf-8")
 	if suffix == ".docx":
-		LoaderCls = _choose_docx_loader()
-		return LoaderCls(str(p))
+		# Prefer LangChain loaders when available; otherwise fall back to python-docx
+		try:
+			LoaderCls = _choose_docx_loader()
+			return LoaderCls(str(p))
+		except Exception:
+			# Fallback: use python-docx to extract paragraphs and tables
+			if python_docx is None:
+				raise RuntimeError("No DOCX loader is available. Install python-docx or langchain extras for DOCX support.")
+
+			def _docx_fallback():
+				doc = python_docx.Document(str(p))
+				parts = []
+				# paragraphs
+				for para in doc.paragraphs:
+					text = para.text.strip()
+					if text:
+						parts.append(text)
+				# tables: convert rows to readable sentences preserving headers
+				for table in doc.tables:
+					# attempt to detect header row
+					head = []
+					if table.rows:
+						for c in table.rows[0].cells:
+							head.append(c.text.strip())
+					for r in table.rows[1:]:
+						cells = [c.text.strip() for c in r.cells]
+						if any(cells):
+							if any(head for head in head):
+								pairs = [f"{h}: {v}" for h, v in zip(head, cells)]
+								parts.append("; ".join(pairs))
+				return "\n\n".join(parts)
+
+			return _docx_fallback
 	if suffix == ".pptx":
 		LoaderCls = _choose_pptx_loader()
 		return LoaderCls(str(p))
@@ -205,15 +247,22 @@ def _get_loader_for_path(path: Union[str, Path]):
 			return "\n\n".join(rows)
 		return _csv_loader
 
-	raise ValueError(f"Unsupported file extension: {suffix}. Supported: .pdf, .txt, .docx, .pptx, .xml, .json, .html, .csv")
-
-
-def load_and_split(
-	paths: Union[str, Path, List[Union[str, Path]]],
-	chunk_size: int = 800,
-	chunk_overlap: int = 100,
-	encoding: Optional[str] = "utf-8",
-):
+if suffix in (".xls", ".xlsx"):
+	def _excel_loader():
+		# Read all sheets and convert into readable narratives preserving headers
+		df_dict = pd.read_excel(p, sheet_name=None)
+		parts = []
+		for sheet_name, df in df_dict.items():
+			parts.append(f"SHEET: {sheet_name}")
+			if df.empty:
+				parts.append("(empty sheet)")
+			else:
+				# make small readable sentences for each row
+				for _, r in df.iterrows():
+					cells = [f"{c}: {r[c]}" for c in df.columns]
+					parts.append("; ".join(cells))
+		return "\n\n".join(parts)
+	return _excel_loader
 	"""Load documents (paths or raw text) and split them into chunks.
 
 	This single function normalizes input so agents can operate on text-only
