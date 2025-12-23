@@ -44,42 +44,41 @@ def main():
 
     st.header("Agentic RAG — Document Analysis")
 
-    col1, col2 = st.columns([1, 3])
-
-    with col1:
-        st.markdown("### Input")
-        uploaded = st.file_uploader("Upload a document (Supported: PDF, TXT, DOCX, PPTX, XML, JSON, HTML, CSV)")
-        raw_text = st.text_area("Or paste text here (optional)", height=200)
-        from agents.classifier import DEFAULT_LABELS
-        default_labels = ", ".join(DEFAULT_LABELS)
-        labels_input = st.text_input("Allowed labels (comma-separated)", value=default_labels)
-        run_btn = st.button("Run analysis")
-
-    with col2:
-        st.markdown("### Results")
-        label_placeholder = st.empty()
-        summary_placeholder = st.empty()
-        findings_placeholder = st.empty()
-
-    # Build llm_predict adapter for Ollama if present
+    # Build llm_predict adapter for Ollama if present and check availability
     llm_predict = get_ollama_predict()
 
-    # Verify that Ollama is actually reachable (daemon running). If it's not
-    # reachable, disable LLM features for this session and inform the user.
     ollama_available = False
     if llm_predict is not None:
         try:
-            # Lightweight health-check call. If this raises, we fall back to disabled mode.
             llm_predict("Ping")
             ollama_available = True
         except Exception as e:  # pragma: no cover - runtime behavior depends on env
             logger.debug("Ollama client present but not responding: %s", e)
             llm_predict = None
 
-    if not ollama_available:
-        # Required user-facing message for non-local environments (e.g., Streamlit Cloud)
-        st.warning("This app requires a local Ollama service. Full functionality is available when running locally.")
-        st.info("LLM features are disabled in this environment; you can still upload files to view loader-only results.")
+    col1, col2 = st.columns([1, 3])
+
+    with col1:
+        st.markdown("### Input")
+
+        if not ollama_available:
+            # Inform user and explain why LLM features are disabled
+            st.warning("This app requires a local Ollama service. Full functionality is available when running locally.")
+            st.info("LLM features are disabled in this environment; the Run button is disabled. You can still upload files to view loader-only results.")
+
+        uploaded = st.file_uploader("Upload a document (Supported: PDF, TXT, DOCX, PPTX, XML, JSON, HTML, CSV)")
+        raw_text = st.text_area("Or paste text here (optional)", height=200)
+        from agents.classifier import DEFAULT_LABELS
+        default_labels = ", ".join(DEFAULT_LABELS)
+        labels_input = st.text_input("Allowed labels (comma-separated)", value=default_labels)
+        # Disable the Run button when Ollama is unavailable to prevent runtime errors
+        run_btn = st.button("Run analysis", disabled=not ollama_available)
+
+    with col2:
+        st.markdown("### Results")
+        label_placeholder = st.empty()
+        summary_placeholder = st.empty()
+        findings_placeholder = st.empty()
 
     controller = Controller(labels=[l.strip() for l in labels_input.split(",")], llm_predict=llm_predict)
 
