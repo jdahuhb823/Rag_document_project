@@ -10,6 +10,5 @@ names = [
 for n in names:
     try:
         __import__(n)
-        print(n, 'FOUND')
-    except Exception as e:
-        print(n, 'MISSING', type(e).__name__)
+    except Exception:
+        pass
